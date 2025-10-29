@@ -4,4 +4,12 @@ from enum import Enum, auto
 class Signal(Enum):
     L1 = auto()
     L2 = auto()
-    S = auto()
+    L3 = auto()
+    L4 = auto()
+    _1S = auto()
+    _2S = auto()
+    L = auto()
+
+    S1 = auto()
+    S2 = auto()
+    S3 = auto()

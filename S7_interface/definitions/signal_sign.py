@@ -7,4 +7,4 @@ class SignalSign(Enum):
     SUMMON = auto()
     FREE = auto()
     SHUNT = auto()
-    EXP40 = auto()
+    WARN = auto()
