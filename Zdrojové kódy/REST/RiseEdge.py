@@ -1,4 +1,4 @@
-class RiseEdge: #trieda detektora nábežnej hrany signálu
+class RiseEdge:  # trieda detektora nábežnej hrany signálu
     def __init__(self):
         self.previous = True
 

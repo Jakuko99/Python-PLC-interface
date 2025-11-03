@@ -1,4 +1,4 @@
-class FallEdge: #trieda detektora nábežnej hrany signálu
+class FallEdge:  # trieda detektora nábežnej hrany signálu
     def __init__(self):
         self.previous = False
 
