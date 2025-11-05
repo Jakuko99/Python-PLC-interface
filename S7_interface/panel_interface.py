@@ -1,7 +1,7 @@
-import s71200
+from S7_interface.s71200 import S71200
 import logging
 
-from definitions.api_package import (
+from S7_interface.definitions.api_package import (
     InputPort,
     OutputPort,
     MemoryLocation,
@@ -10,12 +10,12 @@ from definitions.api_package import (
     TrackSegmentState,
     TrackSegments,
 )
-from panel_elements.api_package import panel_signals, panel_segments
+from S7_interface.panel_elements.api_package import panel_signals, panel_segments
 
 
-class PanelInterface(s71200.S71200):
+class PanelInterface(S71200):
     def __init__(self, ip: str, debug: bool = False):
-        super.__init__(ip, debug)
+        super().__init__(ip, debug)
         self.ip: str = ip
         self.logger = logging.getLogger("App.PLC_interface")
         self.logger.setLevel(logging.DEBUG)
@@ -29,24 +29,24 @@ class PanelInterface(s71200.S71200):
 
     def set_output(self, port: OutputPort, value: bool) -> bool:
         if port:
-            self.writeMem(port.name, value)
+            self.writeMem(port.value, value)
             return True
         return False
 
     def get_input(self, port: InputPort) -> bool:
         if port:
-            return self.getMem(port.name)
+            return self.getMem(port.value)
         return False
 
     def set_memory(self, address: MemoryLocation, value: bool) -> bool:
         if address:
-            self.writeMem(address.name, value)
+            self.writeMem(address.value, value)
             return True
         return False
 
     def get_memory(self, address: MemoryLocation) -> bool:
         if address:
-            return self.getMem(address.name)
+            return self.getMem(address.value)
         return False
 
     def set_signal(self, signal: Signals, sign: SignalSign) -> bool:

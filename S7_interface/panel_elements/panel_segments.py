@@ -1,4 +1,4 @@
-from definitions.api_package import TrackSegments, OutputPort
+from S7_interface.definitions.api_package import TrackSegments, OutputPort
 
 
 class PanelSegments:
