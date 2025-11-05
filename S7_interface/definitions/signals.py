@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
 
-class Signal(Enum):
+class Signals(Enum):
     L1 = auto()
     L2 = auto()
     L3 = auto()

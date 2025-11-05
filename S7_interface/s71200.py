@@ -14,7 +14,7 @@ class S71200:
         self.ip = ip
         self.connected: bool = False
 
-    def connect(self):
+    def connect(self) -> bool:
         try:
             self.plc.connect(self.ip, 0, 1)
         except RuntimeError as e:
@@ -25,6 +25,8 @@ class S71200:
             self.connected = True
             if self.debug:
                 print(f"Connected to PLC at {self.ip}")
+
+        return self.connected
 
     def getMem(self, mem, returnByte=False):
         area = 0x83
