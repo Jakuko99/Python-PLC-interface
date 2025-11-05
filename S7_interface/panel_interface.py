@@ -24,7 +24,10 @@ class PanelInterface(S71200):
 
     def connect_plc(self) -> bool:
         result = self.connect()
-        self.logger.debug(f"Connected to PLC at {self.ip}")
+        if result:
+            self.logger.debug(f"Connected to PLC at {self.ip}")
+        else:
+            self.logger.error(f"Failed to connect to PLC at {self.ip}")
         return result
 
     def set_output(self, port: OutputPort, value: bool) -> bool:
