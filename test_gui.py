@@ -97,25 +97,23 @@ class OutputControl(QWidget):
         font = QFont("Arial", 10)
         font.setBold(True)
 
-        self.state_choice = QComboBox(self)
-        self.state_choice.addItems(["OFF", "ON"])
-        self.set_state_button = QPushButton("Set Output", self)
-        self.set_state_button.clicked.connect(self.set_output_state)
+        self.turn_on_button = QPushButton("Turn on", self)
+        self.turn_on_button.clicked.connect(lambda: self.set_output_state(True))
+        self.turn_off_button = QPushButton("Turn off", self)
+        self.turn_off_button.clicked.connect(lambda: self.set_output_state(False))
         self.label = QLabel(f"{self.output}", self)
         self.label.setWordWrap(True)
         self.label.setFont(font)
 
         self.lazy_layout = QVBoxLayout()
         self.lazy_layout.addWidget(self.label)
-        self.lazy_layout.addWidget(self.state_choice)
-        self.lazy_layout.addWidget(self.set_state_button)
+        self.lazy_layout.addWidget(self.turn_on_button)
+        self.lazy_layout.addWidget(self.turn_off_button)
         self.setLayout(self.lazy_layout)
 
-    def set_output_state(self):
-        selected_state_name = self.state_choice.currentText()
-        selected_state = True if selected_state_name == "ON" else False
+    def set_output_state(self, state: bool):
 
-        self.interface.set_output(OutputPort[self.output], selected_state)
+        self.interface.set_output(OutputPort[self.output], state)
 
 
 class InputControl(QWidget):
@@ -156,13 +154,14 @@ class TestWindow(QMainWindow):
             self.interface.connect_plc
         )
         column += 1
+        COLUMN_SIZE = 7
 
         for segment in TrackSegments:
             layout.addWidget(
                 SegmentControl(segment.name, self.interface, self), row, column
             )
             column += 1
-            if column >= 10:
+            if column >= COLUMN_SIZE:
                 column = 0
                 row += 1
 
@@ -172,7 +171,7 @@ class TestWindow(QMainWindow):
                 SignalControl(signal.name, self.interface, self), row, column
             )
             column += 1
-            if column >= 10:
+            if column >= COLUMN_SIZE:
                 column = 0
                 row += 1
 
@@ -182,7 +181,7 @@ class TestWindow(QMainWindow):
                 OutputControl(output.name, self.interface, self), row, column
             )
             column += 1
-            if column >= 10:
+            if column >= COLUMN_SIZE:
                 column = 0
                 row += 1
 
@@ -192,7 +191,7 @@ class TestWindow(QMainWindow):
                 InputControl(input_port.name, self.interface, self), row, column
             )
             column += 1
-            if column >= 10:
+            if column >= COLUMN_SIZE:
                 column = 0
                 row += 1
 
