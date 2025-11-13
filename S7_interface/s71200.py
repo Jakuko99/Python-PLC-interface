@@ -39,6 +39,8 @@ class S71200:
             area = 0x83
         elif mem[0].lower() == "i":
             area = 0x81
+        elif mem[0].lower() == "q":
+            area = 0x82
 
         if mem[1].lower() == "x":  # bit
             length = 1
@@ -59,6 +61,9 @@ class S71200:
         elif area == 0x83:
             self.plc.read_area(snap7.type.Areas.MK, 0, start, length)
             mbyte = self.plc.read_area(snap7.type.Areas.MK, 0, start, length)
+        elif area == 0x82:
+            self.plc.read_area(snap7.type.Areas.PA, 0, start, length)
+            mbyte = self.plc.read_area(snap7.type.Areas.PA, 0, start, length)
 
         if returnByte:
             return mbyte
@@ -78,6 +83,8 @@ class S71200:
             area = 0x83
         elif mem[0].lower() == "i":
             area = 0x81
+        elif mem[0].lower() == "q":
+            area = 0x82
 
         if mem[1].lower() == "x":  # bit
             start = int(mem.split(".")[0][2:])
@@ -89,6 +96,8 @@ class S71200:
             set_int(data, 0, value)
 
         if area == 0x81:
-            return self.plc.write_area(snap7.types.Areas.PE, 0, start, data)
+            return self.plc.write_area(snap7.type.Areas.PE, 0, start, data)
         elif area == 0x83:
-            return self.plc.write_area(snap7.types.Areas.MK, 0, start, data)
+            return self.plc.write_area(snap7.type.Areas.MK, 0, start, data)
+        elif area == 0x82:
+            return self.plc.write_area(snap7.type.Areas.PA, 0, start, data)            
