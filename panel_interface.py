@@ -1,7 +1,7 @@
-from s71200 import S71200
+from panel_interface.s71200 import S71200
 import logging
 
-from definitions.api_package import (
+from panel_interface.definitions.api_package import (
     InputPort,
     OutputPort,
     MemoryLocation,
@@ -10,7 +10,7 @@ from definitions.api_package import (
     TrackSegmentState,
     TrackSegments,
 )
-from panel_elements.api_package import panel_signals, panel_segments
+from panel_interface.panel_elements.api_package import panel_signals, panel_segments
 
 
 class PanelInterface(S71200):

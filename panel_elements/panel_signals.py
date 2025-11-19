@@ -1,4 +1,4 @@
-from definitions.api_package import Signals, OutputPort, MemoryLocation
+from panel_interface.definitions.api_package import Signals, OutputPort, MemoryLocation
 
 
 class PanelSignals:
