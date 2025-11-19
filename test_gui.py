@@ -1,7 +1,7 @@
 import logging
 
-from S7_interface.panel_interface import PanelInterface
-from S7_interface.definitions.api_package import (
+from panel_interface import PanelInterface
+from definitions.api_package import (
     OutputPort,
     Signals,
     SignalSign,
