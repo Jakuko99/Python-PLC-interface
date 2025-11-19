@@ -87,6 +87,45 @@ class PanelInterface(S71200):
 
         return False
 
+    def get_signal_sign(self, signal: Signals) -> SignalSign:
+        """
+        Get the signal sign.
+
+        :param signal: The signal to get.
+        : return: The sign of the signal (e.g., SignalSign.STOP, SignalSign.FREE).
+        """
+
+        if panel_signals.signal_exists(signal):
+            outputs: dict[str, OutputPort] = panel_signals.get_signal(signal)
+
+            if outputs.get("red", None) and self.get_output(outputs.get("red", None)):
+                return SignalSign.STOP
+
+            elif outputs.get("white_blink", None) and self.get_memory(
+                outputs.get("white_blink", None)
+            ):
+                return SignalSign.SUMMON
+
+            elif outputs.get("green", None) and self.get_output(
+                outputs.get("green", None)
+            ):
+                return SignalSign.FREE
+
+            elif outputs.get("white", None) and self.get_output(
+                outputs.get("white", None)
+            ):
+                return SignalSign.SHUNT
+
+            elif outputs.get("yellow", None) and self.get_output(
+                outputs.get("yellow", None)
+            ):
+                return SignalSign.WARN
+
+            else:
+                return SignalSign.OFF
+
+        return SignalSign.OFF
+
     def set_track_segment(
         self, segment: TrackSegments, state: TrackSegmentState
     ) -> bool:
@@ -116,4 +155,27 @@ class PanelInterface(S71200):
 
             return result
 
-        return False
+    def get_track_segment_state(self, segment: TrackSegments) -> TrackSegmentState:
+        """
+        Get the track segment state.
+        :param segment: The track segment to get the state of.
+        : return: The state of the track segment (e.g., TrackSegmentState.FREE, TrackSegmentState.RESERVED, TrackSegmentState.OCCUPIED).
+        """
+
+        if panel_segments.segment_exists(segment):
+            outputs: dict[str, OutputPort] = panel_segments.get_segment(segment)
+
+            if outputs.get("occupied", None) and self.get_output(
+                outputs.get("occupied", None)
+            ):
+                return TrackSegmentState.OCCUPIED
+
+            elif outputs.get("reserved", None) and self.get_output(
+                outputs.get("reserved", None)
+            ):
+                return TrackSegmentState.RESERVED
+
+            else:
+                return TrackSegmentState.FREE
+
+        return TrackSegmentState.OCCUPIED
