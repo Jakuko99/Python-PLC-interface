@@ -1,4 +1,8 @@
-from panel_interface.definitions.api_package import TrackSegments, OutputPort, MemoryLocation
+from panel_interface.definitions.api_package import (
+    TrackSegments,
+    OutputPort,
+    MemoryLocation,
+)
 
 
 class PanelSegments:

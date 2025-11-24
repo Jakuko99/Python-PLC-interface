@@ -10,6 +10,7 @@ from panel_interface.definitions.api_package import (
     TrackSegmentState,
     TrackSegments,
     DatabaseLocation,
+    ButtonDB,
 )
 from panel_interface.panel_elements.api_package import panel_signals, panel_segments
 
@@ -187,8 +188,21 @@ class PanelInterface(S71200):
                 return TrackSegmentState.FREE
 
         return TrackSegmentState.OCCUPIED
-    
+
     def read_database(self, location: DatabaseLocation, length: int = 1) -> bytearray:
         if location:
             return self.plc.db_read(int(location.value.replace("DB", "")), 0, length)
         return None
+
+    def read_button_db(self, location: DatabaseLocation) -> ButtonDB:
+        data: bytearray = self.read_database(location, 7)
+        button_db = ButtonDB()
+        button_db.button_press = (data[0] & 0b00000001) != 0
+        button_db.button_push = (data[0] & 0b00000010) != 0
+        button_db.blink = (data[0] & 0b00000100) != 0
+
+        button_db.indicator = (data[2] & 0b00000001) != 0
+        button_db.VC_indicator = (data[4] & 0b00000001) != 0
+        button_db.state = data[6]
+
+        return button_db

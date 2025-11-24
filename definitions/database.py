@@ -1,4 +1,31 @@
 from enum import Enum
 
+
 class DatabaseLocation(Enum):
-    L = "DB1"
+    BTN_019_S = "DB1"
+    BTN_029_S = "DB3"
+    BTN_018_S = "DB2"
+    BTN_028_S = "DB4"
+    BTN_027_S = "DB5"
+    BTN_031_S = "DB7"
+    BTN_030_S = "DB6"
+    BTN_011_S = "DB9"
+    BTN_010_S = "DB8"
+    BTN_021_S = "DB11"
+    BTN_020_S = "DB10"
+    BTN_041_S = "DB13"
+    BTN_040_S = "DB12"
+    BTN_061_S = "DB14"
+
+    BTN_019_L = "DB25"
+    BTN_018_L = "DB26"
+    BTN_067_L = "DB23"
+    BTN_031_L = "DB16"
+    BTN_030_L = "DB15"
+    BTN_011_L = "DB18"
+    BTN_010_L = "DB17"
+    BTN_021_L = "DB20"
+    BTN_020_L = "DB19"
+    BTN_041_L = "DB22"
+    BTN_040_L = "DB21"
+    BTN_061_L = "DB24"
