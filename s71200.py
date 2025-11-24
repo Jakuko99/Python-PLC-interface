@@ -41,6 +41,8 @@ class S71200:
             area = 0x81
         elif mem[0].lower() == "q":
             area = 0x82
+        elif mem[0].lower() == "d":
+            area = 0x84
 
         if mem[1].lower() == "x":  # bit
             length = 1
@@ -64,6 +66,9 @@ class S71200:
         elif area == 0x82:
             self.plc.read_area(snap7.type.Areas.PA, 0, start, length)
             mbyte = self.plc.read_area(snap7.type.Areas.PA, 0, start, length)
+        elif area == 0x84:
+            self.plc.read_area(snap7.type.Areas.DB, 0, start, length)
+            mbyte = self.plc.read_area(snap7.type.Areas.DB, 0, start, length)
 
         if returnByte:
             return mbyte

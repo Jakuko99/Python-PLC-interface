@@ -1,4 +1,4 @@
-from panel_interface.definitions.api_package import TrackSegments, OutputPort
+from panel_interface.definitions.api_package import TrackSegments, OutputPort, MemoryLocation
 
 
 class PanelSegments:
@@ -6,6 +6,7 @@ class PanelSegments:
         TrackSegments.TU_ANDAC: {
             "occupied": OutputPort.TU_ANDAC_RED,
             "reserved": OutputPort.TU_ANDAC_YELLOW,
+            "building": MemoryLocation.TU_ANDAC_BLINK,
         },
         TrackSegments.V1_FROG: {
             "occupied": OutputPort.V1_FROG_RED,

@@ -9,6 +9,7 @@ from panel_interface.definitions.api_package import (
     Signals,
     TrackSegmentState,
     TrackSegments,
+    DatabaseLocation,
 )
 from panel_interface.panel_elements.api_package import panel_signals, panel_segments
 
@@ -147,6 +148,8 @@ class PanelInterface(S71200):
                     result = self.set_output(outputs.get("occupied", None), True)
                 case TrackSegmentState.RESERVED:
                     result = self.set_output(outputs.get("reserved", None), True)
+                case TrackSegmentState.BUILDING:
+                    result = self.set_output(outputs.get("building", None), True)
                 case TrackSegmentState.FREE:
                     pass  # all outputs are already reset
                 case _:
@@ -175,7 +178,17 @@ class PanelInterface(S71200):
             ):
                 return TrackSegmentState.RESERVED
 
+            elif outputs.get("building", None) and self.get_memory(
+                outputs.get("building", None)
+            ):
+                return TrackSegmentState.BUILDING
+
             else:
                 return TrackSegmentState.FREE
 
         return TrackSegmentState.OCCUPIED
+    
+    def read_database(self, location: DatabaseLocation, length: int = 1) -> bytearray:
+        if location:
+            return self.plc.db_read(int(location.value.replace("DB", "")), 0, length)
+        return None

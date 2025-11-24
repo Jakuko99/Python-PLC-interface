@@ -5,3 +5,4 @@ class TrackSegmentState(Enum):
     FREE = auto()
     OCCUPIED = auto()
     RESERVED = auto()
+    BUILDING = auto()
