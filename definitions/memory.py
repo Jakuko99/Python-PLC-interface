@@ -3,6 +3,7 @@ from enum import Enum, auto
 
 class MemoryLocation(Enum):
     ALIVE = "MX0.5"
+    RESET_VC = "MX1.4"
 
     L_WHITE_BLINK = "MX0.0"
     S1_WHITE_BLINK = "MX0.1"

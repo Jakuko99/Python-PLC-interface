@@ -194,11 +194,17 @@ class PanelInterface(S71200):
             return self.plc.db_read(int(location.value.replace("DB", "")), 0, length)
         return None
 
+    def write_database(self, location: DatabaseLocation, data: bytearray, offset: int = 0) -> bool:
+        if location:
+            self.plc.db_write(int(location.value.replace("DB", "")), offset, data)
+            return True
+        return False
+
     def read_button_db(self, location: DatabaseLocation) -> ButtonDB:
         data: bytearray = self.read_database(location, 7)
         button_db = ButtonDB()
         button_db.button_press = (data[0] & 0b00000001) != 0
-        button_db.button_push = (data[0] & 0b00000010) != 0
+        button_db.button_pull = (data[0] & 0b00000010) != 0
         button_db.blink = (data[0] & 0b00000100) != 0
 
         button_db.indicator = (data[2] & 0b00000001) != 0
@@ -206,3 +212,16 @@ class PanelInterface(S71200):
         button_db.state = data[6]
 
         return button_db
+
+    def write_button_db(self, location: DatabaseLocation, button_db: ButtonDB) -> bool:
+        data = bytearray(7)
+        data[0] = (
+            (1 if button_db.button_press else 0)
+            | (2 if button_db.button_pull else 0)
+            | (4 if button_db.blink else 0)
+        )
+        data[2] = 1 if button_db.indicator else 0
+        data[4] = 1 if button_db.VC_indicator else 0
+        data[6] = button_db.state
+
+        return self.write_database(location, data)
