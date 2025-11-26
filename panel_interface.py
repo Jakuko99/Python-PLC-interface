@@ -157,8 +157,8 @@ class PanelInterface(S71200):
                     result = self.set_output(outputs.get("occupied", None), True)
                 case TrackSegmentState.RESERVED:
                     result = self.set_output(outputs.get("reserved", None), True)
-                case TrackSegmentState.BUILDING:
-                    result = self.set_output(outputs.get("building", None), True)
+                case TrackSegmentState.PREPARING:
+                    result = self.set_output(outputs.get("preparing", None), True)
                 case TrackSegmentState.FREE:
                     pass  # all outputs are already reset
                 case _:
