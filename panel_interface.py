@@ -66,26 +66,32 @@ class PanelInterface(S71200):
         if panel_signals.signal_exists(signal):
             outputs: dict[str, OutputPort] = panel_signals.get_signal(signal)
 
-            for output in outputs.values():
-                self.set_output(output, False)  # reset all outputs first
+            if not outputs.get("memory", None):
+                for output in outputs.values():
+                    self.set_output(output, False)  # reset all outputs first
 
-            result: bool = False
-            match sign:  # TODO: neeeds to logic for several types of signals
-                case SignalSign.OFF:
-                    pass
-                case SignalSign.STOP:
-                    result = self.set_output(outputs.get("red", None), True)
-                case SignalSign.SUMMON:
-                    result = self.set_output(outputs.get("white_blink", None), True)
-                case SignalSign.FREE:
-                    result = self.set_output(outputs.get("green", None), True)
-                case SignalSign.SHUNT:
-                    result = self.set_output(outputs.get("white", None), True)
-                case SignalSign.WARN:
-                    result = self.set_output(outputs.get("yellow", None), True)
-                case _:
-                    self.logger.error(f"Unknown signal sign: {sign}")
-                    return False
+                result: bool = False
+                match sign:  # TODO: neeeds to logic for several types of signals
+                    case SignalSign.OFF:
+                        pass
+                    case SignalSign.STOP:
+                        result = self.set_output(outputs.get("red", None), True)
+                    case SignalSign.SUMMON:
+                        result = self.set_output(outputs.get("white_blink", None), True)
+                    case SignalSign.FREE:
+                        result = self.set_output(outputs.get("green", None), True)
+                    case SignalSign.SHUNT:
+                        result = self.set_output(outputs.get("white", None), True)
+                    case SignalSign.WARN:
+                        result = self.set_output(outputs.get("yellow", None), True)
+                    case _:
+                        self.logger.error(f"Unknown signal sign: {sign}")
+                        return False
+
+            else:
+                result = self.writeMem(
+                    outputs.get("memory", None).value, int(sign.value)
+                )
 
             return result
 

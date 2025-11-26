@@ -1,27 +1,43 @@
-import logging
-
-from panel_interface import PanelInterface
-from definitions.api_package import (
+from panel_interface.panel_interface import PanelInterface
+from panel_interface.definitions.api_package import (
+    DatabaseLocation,
     OutputPort,
-    Signals,
-    SignalSign,
-    TrackSegmentState,
     InputPort,
     TrackSegments,
+    TrackSegmentState,
+    Signals,
+    SignalSign
 )
 
-logger = logging.getLogger("App")
-logging.basicConfig(level=logging.DEBUG)
+import logging
+from time import sleep
+
+logger = logging.getLogger("App.Test")
+logger.setLevel(logging.DEBUG)
 
 if __name__ == "__main__":
-    panel = PanelInterface("1.1.1.2")
-    if panel.connect_plc():
-        print("PLC connected successfully.")
+    panel = PanelInterface("192.168.1.2")
+    panel.connect_plc()
 
     if panel.connected:
-        for signal in Signals:
-            if panel.set_signal(signal, SignalSign.FREE) is False:
-                panel.set_signal(signal, SignalSign.SHUNT)
+        # for segment in TrackSegments:
+        #     panel.set_track_segment(segment, TrackSegmentState.RESERVED)
 
-        for segment in TrackSegments:
-            panel.set_track_segment(segment, TrackSegmentState.RESERVED)
+        for signal in Signals:
+            panel.set_signal(signal, SignalSign.FREE)
+
+    while panel.connected:
+        vc: bool = False
+        for btn in DatabaseLocation:
+            if panel.read_button_db_field(btn, "VC_indicator"):
+                vc = True
+
+        panel.set_output(OutputPort.ROUTE_SELECTION, vc)
+
+        if panel.get_input(InputPort.ROUTE_CANCEL) or panel.get_input(InputPort.ROUTE_OPTION_CANCEL):
+            for btn in DatabaseLocation:
+                res = panel.write_button_db_field(btn, "state", 0)
+                if res is False:
+                    logger.error(f"Failed to write ButtonDB at {btn.value}")
+
+        sleep(0.5)
