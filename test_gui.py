@@ -209,7 +209,7 @@ logger = logging.getLogger("App")
 logging.basicConfig(level=logging.DEBUG)
 
 if __name__ == "__main__":
-    panel = PanelInterface("1.1.1.2")
+    panel = PanelInterface("192.168.1.2")
     app = QApplication([])
     window = TestWindow(panel)
 

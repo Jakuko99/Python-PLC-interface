@@ -248,6 +248,10 @@ class PanelSegments:
             "occupied": OutputPort._2B_RED,
             "reserved": OutputPort._2B_YELLOW,
         },
+        TrackSegments._1A: {
+            "occupied": OutputPort._1A_RED,
+            "reserved": OutputPort._1A_YELLOW,
+        },
     }
 
     def segment_exists(self, segment: TrackSegments) -> bool:

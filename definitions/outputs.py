@@ -274,6 +274,9 @@ class OutputPort(Enum):
     FAILURE_SUPPLY_TRACK_CIRUITS = "QX33.2"
     FAILURE_ISOLATION_STATE = "QX33.3"
 
+    BELL_L = "QX34.0"
+    BELL_P = "QX34.1"
+
     # arduino bits
     ARDUINO_BIT_1 = "QX33.4"
     ARDUINO_BIT_2 = "QX33.5"

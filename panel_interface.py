@@ -1,4 +1,6 @@
+from snap7.util import set_bool, set_int
 from panel_interface.s71200 import S71200
+from typing import Any
 import logging
 
 from panel_interface.definitions.api_package import (
@@ -19,10 +21,10 @@ class PanelInterface(S71200):
     def __init__(self, ip: str, debug: bool = False):
         super().__init__(ip, debug)
         self.ip: str = ip
-        self.logger = logging.getLogger("App.PLC_interface")
+        self.logger = logging.getLogger("App.Panel_interface")
         self.logger.setLevel(logging.DEBUG)
 
-        self.logger.info("PLC interface initalized")
+        self.logger.info("Panel interface initalized")
 
     def connect_plc(self) -> bool:
         result = self.connect()
@@ -189,20 +191,22 @@ class PanelInterface(S71200):
 
         return TrackSegmentState.OCCUPIED
 
-    def read_database(self, location: DatabaseLocation, length: int = 1) -> bytearray:
+    def _read_database(self, location: DatabaseLocation, length: int = 1) -> bytearray:
         if location:
             return self.plc.db_read(int(location.value.replace("DB", "")), 0, length)
         return None
 
-    def write_database(self, location: DatabaseLocation, data: bytearray, offset: int = 0) -> bool:
+    def _write_database(
+        self, location: DatabaseLocation, data: bytearray, offset: int = 0
+    ) -> bool:
         if location:
             self.plc.db_write(int(location.value.replace("DB", "")), offset, data)
             return True
         return False
 
     def read_button_db(self, location: DatabaseLocation) -> ButtonDB:
-        data: bytearray = self.read_database(location, 7)
-        button_db = ButtonDB()
+        data: bytearray = self._read_database(location, 7)
+        button_db: ButtonDB = ButtonDB()
         button_db.button_press = (data[0] & 0b00000001) != 0
         button_db.button_pull = (data[0] & 0b00000010) != 0
         button_db.blink = (data[0] & 0b00000100) != 0
@@ -214,14 +218,42 @@ class PanelInterface(S71200):
         return button_db
 
     def write_button_db(self, location: DatabaseLocation, button_db: ButtonDB) -> bool:
-        data = bytearray(7)
-        data[0] = (
-            (1 if button_db.button_press else 0)
-            | (2 if button_db.button_pull else 0)
-            | (4 if button_db.blink else 0)
-        )
-        data[2] = 1 if button_db.indicator else 0
-        data[4] = 1 if button_db.VC_indicator else 0
-        data[6] = button_db.state
+        data: bytearray = bytearray(7)
+        set_bool(data, 0, 0, button_db.button_press)
+        set_bool(data, 0, 1, button_db.button_pull)
+        set_bool(data, 0, 2, button_db.blink)
 
-        return self.write_database(location, data)
+        set_bool(data, 2, 0, button_db.indicator)
+        set_bool(data, 4, 0, button_db.VC_indicator)
+        set_int(data, 6, button_db.state)
+
+        return self._write_database(location, data)
+
+    def write_button_db_field(
+        self, location: DatabaseLocation, field: str, value: Any
+    ) -> bool:
+        button_db: ButtonDB = self.read_button_db(location)
+        if not button_db:
+            return False
+
+        if hasattr(button_db, field):
+            setattr(button_db, field, value)
+            return self.write_button_db(location, button_db)
+        else:
+            self.logger.error(f"ButtonDB has no field named '{field}'")
+            return False
+
+    def read_button_db_field(
+        self,
+        location: DatabaseLocation,
+        field: str,
+    ) -> Any:
+        button_db: ButtonDB = self.read_button_db(location)
+        if not button_db:
+            return None
+
+        if hasattr(button_db, field):
+            return getattr(button_db, field)
+        else:
+            self.logger.error(f"ButtonDB has no field named '{field}'")
+            return None

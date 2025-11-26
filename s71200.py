@@ -1,5 +1,6 @@
 import snap7
 from snap7.util import *
+import logging
 
 
 class output(object):
@@ -13,18 +14,19 @@ class S71200:
         self.plc = snap7.client.Client()
         self.ip = ip
         self.connected: bool = False
+        self.logger = logging.getLogger("App.PLC")
 
     def connect(self) -> bool:
         try:
             self.plc.connect(self.ip, 0, 1)
         except RuntimeError as e:
             if self.debug:
-                print(f"Connection error: {e}")
+                self.logger.error(f"Failed to connect to PLC at {self.ip}: {e}")
             self.connected = False
         else:
             self.connected = True
             if self.debug:
-                print(f"Connected to PLC at {self.ip}")
+                self.logger.info(f"Connected to PLC at {self.ip}")
 
         return self.connected
 

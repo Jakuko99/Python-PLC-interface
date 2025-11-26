@@ -79,5 +79,6 @@ class TrackSegments(Enum):
     _2_TU_1_CIFER = auto()
     _2_TU_2_CIFER = auto()
 
+    _1A = auto()
     _1B = auto()
     _2B = auto()
