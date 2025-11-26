@@ -1,7 +1,7 @@
 import logging
 
-from panel_interface import PanelInterface
-from definitions.api_package import (
+from panel_interface.panel_interface import PanelInterface
+from panel_interface.definitions.api_package import (
     OutputPort,
     Signals,
     SignalSign,
