@@ -10,6 +10,7 @@ from panel_interface.definitions.api_package import (
     SignalSign,
     Signals,
     TrackSegmentState,
+    SWitchState,
     TrackSegments,
     DatabaseLocation,
     ButtonDB,
@@ -108,31 +109,37 @@ class PanelInterface(S71200):
         if panel_signals.signal_exists(signal):
             outputs: dict[str, OutputPort] = panel_signals.get_signal(signal)
 
-            if outputs.get("red", None) and self.get_output(outputs.get("red", None)):
-                return SignalSign.STOP
+            if not outputs.get("memory", None):
+                if outputs.get("red", None) and self.get_output(
+                    outputs.get("red", None)
+                ):
+                    return SignalSign.STOP
 
-            elif outputs.get("white_blink", None) and self.get_memory(
-                outputs.get("white_blink", None)
-            ):
-                return SignalSign.SUMMON
+                elif outputs.get("white_blink", None) and self.get_memory(
+                    outputs.get("white_blink", None)
+                ):
+                    return SignalSign.SUMMON
 
-            elif outputs.get("green", None) and self.get_output(
-                outputs.get("green", None)
-            ):
-                return SignalSign.FREE
+                elif outputs.get("green", None) and self.get_output(
+                    outputs.get("green", None)
+                ):
+                    return SignalSign.FREE
 
-            elif outputs.get("white", None) and self.get_output(
-                outputs.get("white", None)
-            ):
-                return SignalSign.SHUNT
+                elif outputs.get("white", None) and self.get_output(
+                    outputs.get("white", None)
+                ):
+                    return SignalSign.SHUNT
 
-            elif outputs.get("yellow", None) and self.get_output(
-                outputs.get("yellow", None)
-            ):
-                return SignalSign.WARN
+                elif outputs.get("yellow", None) and self.get_output(
+                    outputs.get("yellow", None)
+                ):
+                    return SignalSign.WARN
+
+                else:
+                    return SignalSign.OFF
 
             else:
-                return SignalSign.OFF
+                return SignalSign(self.getMem(outputs.get("memory", None).value))
 
         return SignalSign.OFF
 
@@ -148,22 +155,28 @@ class PanelInterface(S71200):
         if panel_segments.segment_exists(segment):
             outputs: dict[str, OutputPort] = panel_segments.get_segment(segment)
 
-            for output in outputs.values():
-                self.set_output(output, False)  # reset all outputs first
+            if not outputs.get("memory", None):
+                for output in outputs.values():
+                    self.set_output(output, False)  # reset all outputs first
 
-            result: bool = False
-            match state:
-                case TrackSegmentState.OCCUPIED:
-                    result = self.set_output(outputs.get("occupied", None), True)
-                case TrackSegmentState.RESERVED:
-                    result = self.set_output(outputs.get("reserved", None), True)
-                case TrackSegmentState.PREPARING:
-                    result = self.set_output(outputs.get("preparing", None), True)
-                case TrackSegmentState.FREE:
-                    pass  # all outputs are already reset
-                case _:
-                    self.logger.error(f"Unknown track segment state: {state}")
-                    return False
+                result: bool = False
+                match state:
+                    case TrackSegmentState.OCCUPIED:
+                        result = self.set_output(outputs.get("occupied", None), True)
+                    case TrackSegmentState.RESERVED:
+                        result = self.set_output(outputs.get("reserved", None), True)
+                    case TrackSegmentState.PREPARING:
+                        result = self.set_output(outputs.get("preparing", None), True)
+                    case TrackSegmentState.FREE:
+                        pass  # all outputs are already reset
+                    case _:
+                        self.logger.error(f"Unknown track segment state: {state}")
+                        return False
+
+            else:
+                result = self.writeMem(
+                    outputs.get("memory", None).value, int(state.value)
+                )
 
             return result
 
@@ -177,25 +190,51 @@ class PanelInterface(S71200):
         if panel_segments.segment_exists(segment):
             outputs: dict[str, OutputPort] = panel_segments.get_segment(segment)
 
-            if outputs.get("occupied", None) and self.get_output(
-                outputs.get("occupied", None)
-            ):
-                return TrackSegmentState.OCCUPIED
+            if not outputs.get("memory", None):
+                if outputs.get("occupied", None) and self.get_output(
+                    outputs.get("occupied", None)
+                ):
+                    return TrackSegmentState.OCCUPIED
 
-            elif outputs.get("reserved", None) and self.get_output(
-                outputs.get("reserved", None)
-            ):
-                return TrackSegmentState.RESERVED
+                elif outputs.get("reserved", None) and self.get_output(
+                    outputs.get("reserved", None)
+                ):
+                    return TrackSegmentState.RESERVED
 
-            elif outputs.get("building", None) and self.get_memory(
-                outputs.get("building", None)
-            ):
-                return TrackSegmentState.BUILDING
+                elif outputs.get("building", None) and self.get_memory(
+                    outputs.get("building", None)
+                ):
+                    return TrackSegmentState.BUILDING
+
+                else:
+                    return TrackSegmentState.FREE
 
             else:
-                return TrackSegmentState.FREE
+                return TrackSegmentState(self.getMem(outputs.get("memory", None).value))
 
         return TrackSegmentState.OCCUPIED
+
+    def set_switch_state(self, switch: TrackSegments, state: SWitchState) -> bool:
+        if panel_segments.segment_exists(switch):
+            outputs: dict[str, OutputPort] = panel_segments.get_segment(switch)
+
+            if outputs.get("memory", None) is None:
+                self.logger.error(f"Switch {switch} has no memory location defined")
+                return False
+
+            result = self.writeMem(outputs.get("memory", None).value, int(state.value))
+
+            return result
+
+    def get_switch_state(self, switch: TrackSegments) -> SWitchState:
+        if panel_segments.segment_exists(switch):
+            outputs: dict[str, OutputPort] = panel_segments.get_segment(switch)
+
+            if outputs.get("memory", None) is None:
+                self.logger.error(f"Switch {switch} has no memory location defined")
+                return SWitchState.CHANGING
+
+            return SWitchState(self.getMem(outputs.get("memory", None).value))
 
     def _read_database(self, location: DatabaseLocation, length: int = 1) -> bytearray:
         if location:

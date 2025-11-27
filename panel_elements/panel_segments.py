@@ -9,8 +9,7 @@ class PanelSegments:
     segment_dict: dict[TrackSegments, dict[str, OutputPort]] = {
         TrackSegments.TU_ANDAC: {
             "occupied": OutputPort.TU_ANDAC_RED,
-            "reserved": OutputPort.TU_ANDAC_YELLOW,
-            "building": MemoryLocation.TU_ANDAC_BLINK,
+            "reserved": OutputPort.TU_ANDAC_YELLOW,            
         },
         TrackSegments.V1_FROG: {
             "occupied": OutputPort.V1_FROG_RED,
